@@ -13,6 +13,11 @@ their observation time.
 
 How to Use:
 -----------
+Switch to a virtual environment! ``cd`` into project's directory.
+
+Install all the dependencies: 
+
+    $ pip install -r requirements.txt 
 
 Run in your terminal:
 
