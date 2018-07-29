@@ -2,7 +2,7 @@
 Astrool - Weather
 =================
 
-.. image:: obj.png
+.. image:: logo.png
    :target: https://shreyasb.com
    :alt: astrool logo
    :width: 400px
@@ -10,14 +10,15 @@ Astrool - Weather
 
 A very basic and minimal weather app designed for Astronomers planning
 their observation time.
+Contains different interactive visualisations to understand better.
 
 How to Use:
 -----------
 Switch to a virtual environment! ``cd`` into project's directory.
 
-Install all the dependencies: 
+Install all the dependencies:
 
-    $ pip install -r requirements.txt 
+    $ pip install -r requirements.txt
 
 Run in your terminal:
 
@@ -37,3 +38,12 @@ Credits:
 Akshita Jain, GitHub: akshita0208_.
 
 .. _akshita0208: https://github.com/akshita0208/
+
+Example View:
+=============
+
+.. image:: example_ss.png
+   :target: https://shreyasb.com
+   :alt: astrool logo
+   :width: 400px
+   :align: center

@@ -6,7 +6,7 @@ import geocoder
 from datetime import datetime
 import forecastio
 from dash.dependencies import Input, Output, State
-
+import plotly.graph_objs as go
 
 def weather_on(loca):
     a = geocoder.location(location=loca)
@@ -17,11 +17,69 @@ def weather_on(loca):
     byHour = forecast.hourly()
     return byHour
 
+def weather_latest(loca):
+    a = geocoder.location(location=loca)
+    api_key = "c5dde0bafce3442350c75b743864339a"
+    lat = a.latlng[0]
+    lng = a.latlng[1]
+    forecast = forecastio.load_forecast(api_key, lat, lng, time=datetime.now())
+    this = forecast.currently().d
+    return this
+
+def get_sum_td(this):
+    keys= []
+    val=[]
+    for k, v in this.items():
+        keys.append(k.capitalize())
+        val.append(v)
+    return keys, val
+
 def get_icon(byhour):
     return byhour.icon
 
 def get_summary(byhour):
     return byhour.summary
+
+def get_cur_temp(this):
+    return this['temperature']
+
+def get_cur_pro(this):
+    return this['precipProbability']
+
+def get_cur_h(this):
+    return this['humidity']
+
+def get_data_24h(byhour):
+    temp = []
+    date = []
+    for hourlyData in byhour.data:
+        temp.append(hourlyData.temperature)
+        date.append(hourlyData.time)
+    return temp, date
+
+def get_data_24h_clo(byhour):
+    clo = []
+    date = []
+    for hourlyData in byhour.data:
+        clo.append(hourlyData.d['cloudCover'])
+        date.append(hourlyData.time)
+    return clo, date
+
+def get_data_24h_pre(byhour):
+    clo = []
+    date = []
+    for hourlyData in byhour.data:
+        clo.append(hourlyData.d['precipProbability'])
+        date.append(hourlyData.time)
+    return clo, date
+
+def get_data_24h_in(byhour):
+    clo = []
+    date = []
+    for hourlyData in byhour.data:
+        clo.append(hourlyData.d['precipIntensity'])
+        date.append(hourlyData.time)
+    return clo, date
 
 app = dash.Dash()
 app.title = 'Weather || Astrool'
@@ -63,6 +121,12 @@ app.layout = html.Div([
         'margin-right': 'auto'
     },),
     html.Button(id='submit-button', n_clicks=0, children='Submit'),
+    html.H3(
+            children='Weather Report for the asked location: ',
+            style={
+                'textAlign': 'center'
+            }
+        ),
     html.Div(id='output-state'),
     html.P('     '),
     html.P('     '),
@@ -80,6 +144,103 @@ app.layout = html.Div([
             style={
                 'textAlign': 'center'
             }),
+    html.P('     '),
+    # html.H2(style={'textAlign': 'center'}, children='Current Temperature:'),
+    html.H2(id='temp',
+            style={
+                'textAlign': 'center',
+                'color': 'blue'
+            }),
+    html.H2(id='precip',
+            style={
+                'textAlign': 'center',
+                'color': 'red'
+            }),
+    html.H2(id='h',
+            style={
+                'textAlign': 'center',
+                'color': 'green'
+            }),
+    html.H1(
+            children='Visualisations to help understand: ',
+            style={
+                'textAlign': 'center'
+            }
+        ),
+    html.H3(
+            children='1) Plot of Variation of Temperature in a day : ',
+            style={
+                'textAlign': 'left',
+                'margin-left': '30%',
+                'color':'blue'
+            }
+        ),
+    dcc.Graph(
+        id='first_graph',
+        style={'width': '50%',
+               'margin-left':'26%'},
+    ),
+    html.H3(
+            children='2) Plot of Variation of Cloud Cover in a day : ',
+            style={
+                'textAlign': 'left',
+                'margin-left': '30%',
+                'color':'blue'
+            }
+        ),
+    dcc.Graph(
+        id='first_graph1',
+        style={'width': '50%',
+               'margin-left':'26%'},
+    ),
+    html.H3(
+            children='3) Plot of Variation of Precipitation Probability in a day : ',
+            style={
+                'textAlign': 'left',
+                'margin-left': '30%',
+                'color':'blue'
+            }
+        ),
+    html.H4(
+            children='You can go out taking your telescope on the time where the graph is at 0.',
+            style={
+                'textAlign': 'left',
+                'margin-left': '30%',
+                'color':'red'
+            }
+        ),
+    dcc.Graph(
+        id='first_graph2',
+        style={'width': '50%',
+               'margin-left':'26%'},
+    ),
+    html.H3(
+            children='4) Plot of Variation of Precipitation Intensity in a day : ',
+            style={
+                'textAlign': 'left',
+                'margin-left': '30%',
+                'color':'blue'
+            }
+        ),
+    dcc.Graph(
+        id='first_graph3',
+        style={'width': '50%',
+               'margin-left':'26%'},
+    ),
+    html.H4(
+            children='Credits: Akshita Jain - @akshita0208 on GitHub',
+            style={
+                'textAlign': 'center',
+                'color':'red'
+            }
+        ),
+    html.H4(
+            children='Copyright © 2018 - Shreyas Bapat(@shreyasbapat) ',
+            style={
+                'textAlign': 'center',
+                'color':'red'
+            }
+        ),
 ])
 
 
@@ -97,6 +258,27 @@ def ret_str(val):
 
 def ret_sum(val):
     return get_summary(weather_on(val))
+
+def ret_temp(val):
+    return get_cur_temp(weather_latest(val))
+
+def ret_pre(val):
+    return get_cur_pro(weather_latest(val))
+
+def ret_h(val):
+    return get_cur_h(weather_latest(val))
+
+def ret_tup(val):
+    return get_data_24h(weather_on(val))
+
+def ret_tup2(val):
+    return get_data_24h_clo(weather_on(val))
+
+def ret_tup3(val):
+    return get_data_24h_pre(weather_on(val))
+
+def ret_tup4(val):
+    return get_data_24h_in(weather_on(val))
 
 @app.callback(Output('image', 'src'),
               [Input('submit-button', 'n_clicks')],
@@ -117,9 +299,93 @@ def update_msg1(n_clicks, value):
               [Input('submit-button', 'n_clicks')],
               [State('input-1-state', 'value')])
 def update_msg(n_clicks, value):
-    stringo = ret_sum(value)
+    stringo = "Summary: " + ret_sum(value)
     return stringo
 
+@app.callback(Output('temp', 'children'),
+              [Input('submit-button', 'n_clicks')],
+              [State('input-1-state', 'value')])
+def update_msg2(n_clicks, value):
+    stringo = str(ret_temp(value))
+    stringo = "Current Temperature: " + stringo + "℃"
+    return stringo
+
+@app.callback(Output('precip', 'children'),
+              [Input('submit-button', 'n_clicks')],
+              [State('input-1-state', 'value')])
+def update_msg3(n_clicks, value):
+    stringo = str(ret_pre(value))
+    stringo = "Probablilty of Rain: " + stringo
+    return stringo
+
+@app.callback(Output('h', 'children'),
+              [Input('submit-button', 'n_clicks')],
+              [State('input-1-state', 'value')])
+def update_msg4(n_clicks, value):
+    stringo = str(ret_h(value))
+    stringo = "Humidity: " + stringo
+    return stringo
+
+@app.callback(Output('first_graph', 'figure'),
+              [Input('submit-button', 'n_clicks')],
+              [State('input-1-state', 'value')])
+def prin_gra(n_clicks, value):
+    a,b = ret_tup(value)
+    dict = {
+        'data' : [
+            {
+                'x' : b,
+                'y' : a,
+                'name' : 'Temperature Data for 24 hours'
+            }
+        ]
+    }
+    return dict
+
+@app.callback(Output('first_graph1', 'figure'),
+              [Input('submit-button', 'n_clicks')],
+              [State('input-1-state', 'value')])
+def prin_gra1(n_clicks, value):
+    a,b =  ret_tup2(value)
+    dict = {
+        'data' : [
+            {
+                'x' : b,
+                'y' : a,
+            }
+        ]
+    }
+    return dict
+
+@app.callback(Output('first_graph2', 'figure'),
+              [Input('submit-button', 'n_clicks')],
+              [State('input-1-state', 'value')])
+def prin_gra1(n_clicks, value):
+    a,b =  ret_tup3(value)
+    dict = {
+        'data' : [
+            {
+                'x' : b,
+                'y' : a,
+            }
+        ]
+    }
+    return dict
+
+@app.callback(Output('first_graph3', 'figure'),
+              [Input('submit-button', 'n_clicks')],
+              [State('input-1-state', 'value')])
+def prin_gra1(n_clicks, value):
+    a,b =  ret_tup4(value)
+    dict = {
+        'data' : [
+            {
+                'x' : b,
+                'y' : a,
+            }
+        ]
+    }
+    return dict
 
 if __name__ == '__main__':
     app.run_server(debug=True)
