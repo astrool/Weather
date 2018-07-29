@@ -45,5 +45,5 @@ Example View:
 .. image:: example_ss.png
    :target: https://shreyasb.com
    :alt: astrool logo
-   :width: 400px
+   :width: 70%
    :align: center
