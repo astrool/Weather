@@ -7,6 +7,7 @@ from datetime import datetime
 import forecastio
 from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
+import argparse
 
 def weather_on(loca):
     a = geocoder.location(location=loca)
@@ -388,4 +389,12 @@ def prin_gra1(n_clicks, value):
     return dict
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    # Defining argparse argument for changing app port
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', type=int, help='Port to run the dash app, defaults to 8050')
+    args = parser.parse_args()
+    
+    if args.port is None:
+        app.run_server(debug=True)
+    else:
+        app.run_server(debug=True, port=args.port)
